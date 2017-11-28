@@ -2,7 +2,7 @@
 
 
 // TODO: 砲台の位置を画面左に、ターゲットの位置を画面右に移動させる。(A)
-// TODO: 雲の位置を左から右に動かす。見えなくなったら左端に戻す。(B)
+// TODO: 雲の位置を左から右に動かす。見えなくなったら左端に戻す。(B)hw16a076 小谷　将豊
 // TODO: 砲台を青い壁に沿って上下に動かす。(C)
 // TODO: 弾のスピードを速くし、弾が画面右端を通り越したら再度発射可能にする。(D)
 // TODO: スコアのサイズを大きくする。(E)
@@ -16,6 +16,8 @@ Vector2 cannonPos;      //!< 砲台の位置
 Vector2 bulletPos;      //!< 弾の位置
 Rect    targetRect;     //!< ターゲットの矩形
 int     score;          //!< スコア
+float   vx_cloud = 30;
+float   vy_cannon = 3;
 
 
 // ゲーム開始時に呼ばれる関数です。
@@ -34,6 +36,7 @@ void Update()
     // 弾の発射
     if (bulletPos.x <= -999 && Input::GetKeyDown(KeyMask::Space)) {
         bulletPos = cannonPos + Vector2(50, 10);
+        PlaySound("se_maoudamashii_system43.mp3");
     }
 
     // 弾の移動
@@ -45,6 +48,7 @@ void Update()
         if (targetRect.Overlaps(bulletRect)) {
             score += 1;         // スコアの加算
             bulletPos.x = -999; // 弾を発射可能な状態に戻す
+            PlaySound("se_maoudamashii_explosion03.mp3");
         }
     }
 
@@ -54,6 +58,12 @@ void Update()
 
     // 雲の描画
     DrawImage("cloud1.png", cloudPos);
+    
+    // 雲の移動（HW16A076 小谷　将豊）
+    cloudPos.x += 500 * Time::deltaTime;
+        if(cloudPos.x > 320){
+            cloudPos.x = -540;
+        }
 
     // 弾の描画
     if (bulletPos.x > -999) {
@@ -63,6 +73,15 @@ void Update()
     // 砲台の描画
     FillRect(Rect(cannonPos.x-10, -140, 20, 100), Color::blue);
     DrawImage("cannon.png", cannonPos);
+    cannonPos.y += vy_cannon*5;
+    if ( cannonPos.y > -60 ) {
+        cannonPos.y = -60;
+        vy_cannon *= -1;
+    }
+    if ( cannonPos.y < -150 ) {
+        cannonPos.y = -150;
+        vy_cannon *= -1;
+    }
 
     // ターゲットの描画
     FillRect(targetRect, Color::red);
